@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Login Form Tutorial</title>
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+		<div class="login-form">
+			<h1>Register Form</h1>
+			<form action="register" method="POST">
+				<input type="text" name="name" placeholder="Full Name" required>
+				<input type="text" name="email" placeholder="Email" required>
+				<input type="text" name="username" placeholder="Username" required>	
+				<input type="password" name="password" placeholder="Password" required>
+				<input type="password" name="password" placeholder="Repeat Password" required>
+				<div id="errormessage"></div>
+				<input type="submit">
+			</form>
+		</div>
+
+		<!-- jQuery library -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+		<!-- egen javascript -->
+		<script src="javascript/register.js"></script>
+	
+		<!-- Popper JS -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	
+		<!-- Latest compiled JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	</body>
+</html>
