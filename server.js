@@ -12,21 +12,22 @@ const sessions = require('express-session');
 
 app.use(express.static('public'))
 app.use(cookieParser());
-const oneDay = 1000 * 60 * 60 * 24;
-app.use(sessions({
-    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
-    saveUninitialized:true,
-    cookie: { maxAge: oneDay },
-    resave: false 
-}));
-var session;
 
-io.on('connection', (socket) => {
-  socket.on('chat_message', (msg) => {
-    console.log(msg);
-    io.emit('chat_message', msg);
-  });
-});
+// const oneDay = 1000 * 60 * 60 * 24;
+// app.use(sessions({
+//     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+//     saveUninitialized:true,
+//     cookie: { maxAge: oneDay },
+//     resave: false 
+// }));
+// var session;
+
+// io.on('connection', (socket) => {
+//   socket.on('chat_message', (msg) => {
+//     console.log(msg);
+//     io.emit('chat_message', msg);
+//   });
+// });
 
 server.listen(3000, () => {
   console.log('listening on *:3000');
@@ -82,7 +83,7 @@ function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
             con.end(function(err) {
               if (err) throw err;
             });
-            return res.redirect("login.html");
+            return res.redirect("login.html?success");
           }); 
         }
       }
@@ -105,16 +106,21 @@ function LoginUser(req, res, username, password) {
       if (err) throw err;
       console.log(result);
       if (result.length == 1) {
-        session=req.session;
-        session.userid=username;
-        console.log(req.session)
+        // create some sort os session
+        // session=req.session;
+        // session.userid=username;
+        // console.log(req.session)
+        con.end(function(err) {
+          if (err) throw err;
+        });
+        return res.redirect("index.html");
       }
-      // else{
-      //   res.send('Invalid username or password');
-      // }
-      con.end(function(err) {
-        if (err) throw err;
-      });
+      else{
+        con.end(function(err) {
+          if (err) throw err;
+        });
+        return res.redirect("login.html?wronglogin");
+      }
     });
   }); 
 }

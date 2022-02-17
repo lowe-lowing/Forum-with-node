@@ -11,6 +11,7 @@
 			<form action="login" method="POST">
 				<input type="text" name="username" placeholder="Username or Email" required>
 				<input type="password" name="password" placeholder="Password" required>
+				<div id="errormessage"></div>
 				<input type="submit">
 			</form>
 		</div>
@@ -19,7 +20,8 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 		<!-- egen javascript -->
-		<!-- <script src="javascript/register.js"></script> -->
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="javascript/login.js"></script>
 	
 		<!-- Popper JS -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
