@@ -13,21 +13,12 @@ const sessions = require('express-session');
 app.use(express.static('public'))
 app.use(cookieParser());
 
-// const oneDay = 1000 * 60 * 60 * 24;
-// app.use(sessions({
-//     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
-//     saveUninitialized:true,
-//     cookie: { maxAge: oneDay },
-//     resave: false 
-// }));
-// var session;
-
-// io.on('connection', (socket) => {
-//   socket.on('chat_message', (msg) => {
-//     console.log(msg);
-//     io.emit('chat_message', msg);
-//   });
-// });
+io.on('connection', (socket) => {
+  socket.on('test', (msg) => {
+    console.log(msg);
+    io.emit('testfromserver', "test logged in server");
+  });
+});
 
 server.listen(3000, () => {
   console.log('listening on *:3000');
@@ -105,20 +96,19 @@ function LoginUser(req, res, username, password) {
     con.query(`SELECT * FROM users WHERE (usersUid = '${username}' AND usersPwd = '${hashedPwd}') OR (usersEmail = '${username}' AND usersPwd = '${hashedPwd}');`, function (err, result) {
       if (err) throw err;
       console.log(result);
-      if (result.length == 1) {
-        // create some sort os session
-        // session=req.session;
-        // session.userid=username;
-        // console.log(req.session)
-        con.end(function(err) {
-          if (err) throw err;
+      con.end(function(err) {
+        if (err) throw err;
+      });
+      console.log(result.length);
+      if (result.length === 1) {
+        // login user
+        io.on('connection', (socket) => {
+          // console.log(socket);
+          socket.emit('login', "testUser");
         });
-        return res.redirect("index.html");
       }
       else{
-        con.end(function(err) {
-          if (err) throw err;
-        });
+        // login failed
         return res.redirect("login.html?wronglogin");
       }
     });

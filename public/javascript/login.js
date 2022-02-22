@@ -8,7 +8,14 @@ if (location.href.includes("success")) {
 }
 var socket = io();
 
-socket.on('userloggedin', function(username) {
+socket.on('login', function(username) {
     console.log(username);
     errordiv.innerHTML = "user logged in successfully";
 });
+socket.on('testfromserver', function(bruh) {
+    console.log(bruh);
+})
+function test() {
+    console.log("btn pressed");
+    socket.emit('test', "io test")
+}
