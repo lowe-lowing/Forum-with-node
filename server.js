@@ -8,17 +8,17 @@ const mysql = require("mysql");
 const crypto = require('crypto');
 const validator = require("email-validator");
 const cookieParser = require("cookie-parser");
-const sessions = require('express-session');
+// const sessions = require('express-session');
 
 app.use(express.static('public'))
 app.use(cookieParser());
 
-io.on('connection', (socket) => {
-  socket.on('test', (msg) => {
-    console.log(msg);
-    io.emit('testfromserver', "test logged in server");
-  });
-});
+// io.on('connection', (socket) => {
+//   socket.on('login', (data) => {
+//     console.log(data);
+//     io.emit('testfromserver', "test logged in server");
+//   });
+// });
 
 server.listen(3000, () => {
   console.log('listening on *:3000');
@@ -81,7 +81,7 @@ function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
     });
   }); 
 }
-
+var loggedin = false;
 function LoginUser(req, res, username, password) {
   let con = mysql.createConnection({
     host: "localhost",
@@ -91,27 +91,35 @@ function LoginUser(req, res, username, password) {
   });
   con.connect(function(err) {
     if (err) throw err;
-    console.log(password);
+
     var hashedPwd = crypto.createHash('md5').update(password).digest('hex');
     con.query(`SELECT * FROM users WHERE (usersUid = '${username}' AND usersPwd = '${hashedPwd}') OR (usersEmail = '${username}' AND usersPwd = '${hashedPwd}');`, function (err, result) {
       if (err) throw err;
       console.log(result);
-      con.end(function(err) {
-        if (err) throw err;
-      });
-      console.log(result.length);
+      
       if (result.length === 1) {
         // login user
+        // res.json({ user: result.RowDataPacket.usersUid })
+        loggedin = true;
+        console.log("bruh");
         io.on('connection', (socket) => {
-          // console.log(socket);
+          console.log("connected");
           socket.emit('login', "testUser");
         });
+        return res.redirect("login.html");
       }
-      else{
+      else {
         // login failed
         return res.redirect("login.html?wronglogin");
       }
+
     });
   }); 
+  // if (loggedin == true) {
+    // io.on('connection', (socket) => {
+    //   console.log("connected");
+    //   socket.emit('login', "testUser");
+    // });
+  // }
 }
 // nästa gång: get cockie on client

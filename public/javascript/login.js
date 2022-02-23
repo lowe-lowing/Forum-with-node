@@ -10,6 +10,7 @@ var socket = io();
 
 socket.on('login', function(username) {
     console.log(username);
+    socket.emit("bruh",  { my: 'data' })
     errordiv.innerHTML = "user logged in successfully";
 });
 socket.on('testfromserver', function(bruh) {
