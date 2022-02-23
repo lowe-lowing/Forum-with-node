@@ -9,14 +9,6 @@ if (location.href.includes("success")) {
 var socket = io();
 
 socket.on('login', function(username) {
-    console.log(username);
-    socket.emit("bruh",  { my: 'data' })
-    errordiv.innerHTML = "user logged in successfully";
+    localStorage.setItem("username", username)
+    window.location.href = "index.html"
 });
-socket.on('testfromserver', function(bruh) {
-    console.log(bruh);
-})
-function test() {
-    console.log("btn pressed");
-    socket.emit('test', "io test")
-}

@@ -13,13 +13,6 @@ const cookieParser = require("cookie-parser");
 app.use(express.static('public'))
 app.use(cookieParser());
 
-// io.on('connection', (socket) => {
-//   socket.on('login', (data) => {
-//     console.log(data);
-//     io.emit('testfromserver', "test logged in server");
-//   });
-// });
-
 server.listen(3000, () => {
   console.log('listening on *:3000');
 });
@@ -81,7 +74,7 @@ function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
     });
   }); 
 }
-var loggedin = false;
+
 function LoginUser(req, res, username, password) {
   let con = mysql.createConnection({
     host: "localhost",
@@ -98,13 +91,11 @@ function LoginUser(req, res, username, password) {
       console.log(result);
       
       if (result.length === 1) {
-        // login user
-        // res.json({ user: result.RowDataPacket.usersUid })
-        loggedin = true;
-        console.log("bruh");
+        // login success
+        username = result[0].usersUid
+        console.log(`user: ${username} logged in`);
         io.on('connection', (socket) => {
-          console.log("connected");
-          socket.emit('login', "testUser");
+          socket.emit('login', username);
         });
         return res.redirect("login.html");
       }
@@ -112,14 +103,7 @@ function LoginUser(req, res, username, password) {
         // login failed
         return res.redirect("login.html?wronglogin");
       }
-
     });
   }); 
-  // if (loggedin == true) {
-    // io.on('connection', (socket) => {
-    //   console.log("connected");
-    //   socket.emit('login', "testUser");
-    // });
-  // }
 }
-// nästa gång: get cockie on client
+// nästa gång gör profil sida

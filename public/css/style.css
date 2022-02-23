@@ -1,3 +1,19 @@
+body {
+    
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.title {
+    margin: 0 auto;
+    font-family: Tahoma, Geneva, sans-serif;
+}
+.title h1 {
+    text-align: center;
+    color: #4d4d4d;
+    font-size: 24px;
+}
+
 .login-form {
     width: 300px;
     margin: 0 auto;
@@ -30,4 +46,60 @@
 #errormessage {
     margin-bottom: 10px;
     color: red;
+}
+a, a:hover, a:focus, a:active {
+    text-decoration: none;
+    color: white;
+}
+header {
+    display: flex;
+    justify-content: right;
+    width: 100%;
+    /* background-color: red; */
+}
+
+/* CSS */
+.button-36 {
+  background-image: linear-gradient(92.88deg, #455EB5 9.16%, #5643CC 43.89%, #673FD7 64.72%);
+  border-radius: 8px;
+  border-style: none;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: "Inter UI","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 10px 15px;
+  text-align: center;
+  text-shadow: rgba(0, 0, 0, 0.25) 0 3px 8px;
+  transition: all .5s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-36:hover {
+  box-shadow: rgba(80, 63, 205, 0.5) 0 1px 30px;
+  transition-duration: .1s;
+}
+
+/* @media (min-width: 768px) {
+  .button-36 {
+    padding: 0 2.6rem;
+  }
+} */
+
+.pfp img {
+    width: 50px;
+    float: right;
+}
+.username {
+    margin-left: 25px;
+    margin-bottom: 5px;
+    color: black;
+}
+#logout {
+    padding: 5px 8px;
+    font-size: small;
 }

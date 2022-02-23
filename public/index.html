@@ -6,10 +6,23 @@
 		<link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
-		<div class="login-form">
-			<h1>Login</h1>
-			<a href="login.html">Login</a>
-			<a href="register.html">Register</a>
+		<header>
+				<!-- logged in -->
+				<div class="loggedin" style="display: none;">
+					<a href="profile.html">
+						<div class="pfp"><img src="/images/default_pfp.jpg" alt="default profile public"></div>
+						<div class="username"></div>
+					</a>
+					<button id="logout" class="button-36" role="button" onclick="logout()">Logout</button>
+				</div>
+				<!-- not logged in -->
+				<div class="notloggedin" style="display: none;">
+					<button id="login" class="button-36" role="button"><a href="login.html">Login</a></button>
+					<button id="register" class="button-36" role="button"><a href="register.html">Register</a></button>
+				</div>
+		</header>
+		<div class="title">
+			<h1>Forum made with node.js</h1>
 		</div>
 		<div class="userdiv"></div>
 		<!-- jQuery library -->
