@@ -26,7 +26,7 @@
 			<div class="title">
 				<h1>Forum made with node.js</h1>
 			</div>
-			<button id="myBtn">Skapa inlägg</button>
+			<div class="btnDiv"></div>
 			<h2>Forums:</h2>
 			<div class="posts"></div>
 		</div>
@@ -35,7 +35,7 @@
 			<div class="modal-content">
 			  <span class="close">&times;</span>
 			  <form action="create_post" method="POST">
-				<input type="hidden" name="usersId" id="usersId" value="">
+				<input type="hidden" name="creator" id="usersName" value="">
 				<input type="text" name="title" placeholder="Title..."><br>
 				<input type="text" name="subject" placeholder="Subject..."><br>
 				<input type="text" name="content" placeholder="Content..."><br>

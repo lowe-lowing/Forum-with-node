@@ -13,11 +13,13 @@ const cookieParser = require("cookie-parser");
 
 app.use(express.static('public'))
 app.use(cookieParser());
-/* final catch-all route to index.html defined last */
-app.get('/index.html', (req, res) => {
-  console.log("iconv");
-  res.send({success: true, message: '<li>New list item number 1</li><li>New list item number 2</li>'});
-})
+
+app.post('/change',function(req,res){
+  // the message being sent back will be saved in a localSession variable
+  // send back a couple list items to be added to the DOM
+  get_all_posts(res);
+});
+
 /* final catch-all route to index.html defined last */
 app.get('/*', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
@@ -38,7 +40,7 @@ app.post("/login", function(req, res) {
 });
 app.post("/create_post", function(req, res) {
   let body = req.body;
-  create_post(body.usersId, body.title, body.subject, body.content)
+  create_post(body.creator, body.title, body.subject, body.content, res)
 });
 
 function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
@@ -105,11 +107,12 @@ function LoginUser(req, res, username, password) {
       
       if (result.length === 1) {
         // login success
-        username = result[0].usersUid
-        id = result[0].usersId
+        var username = result[0].usersUid
+        var usersName = result[0].usersName
+        var id = result[0].usersId
         console.log(`user: ${username} logged in`);
         io.on('connection', (socket) => {
-          socket.emit('login', username, id);
+          socket.emit('login', username, id, usersName);
         });
         return res.redirect("login.html");
       }
@@ -121,7 +124,7 @@ function LoginUser(req, res, username, password) {
   }); 
 }
 
-function create_post(id, title, subject, content) {
+function create_post(usersName, title, subject, content, res) {
   let con = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -132,11 +135,11 @@ function create_post(id, title, subject, content) {
   con.connect(function(err) {
     if (err) throw err;
     // $id, $title, $subject, $content
-    sql = `INSERT INTO forums (usersId, title, subject, content) VALUES (${id}, '${title}', '${subject}', '${content}');`
+    sql = `INSERT INTO forums (publisher, title, subject, content) VALUES ('${usersName}', '${title}', '${subject}', '${content}');`
     con.query(sql, function (err, result) {
       if (err) throw err;
       console.log(result);
-
+      return res.redirect("index.html")
     });
   }); 
 }
@@ -155,7 +158,17 @@ function get_all_posts(res) {
     con.query(sql, function (err, result) {
       if (err) throw err;
       console.log(result);
-      res.send(result);
+      let html = "";
+      result.forEach(element => {
+        html += `
+        <div class="post">
+          <div class="post-title">Title: ${element.title}</div>
+          <div class="post-subject">Subject: ${element.subject}</div>
+          <div class="post-content">Content: ${element.content}</div>
+          <div class="post-creator">Creator: ${element.publisher}</div>
+        </div><br>`
+      });
+      res.send({success: true, message: html});
     });
   }); 
 }
