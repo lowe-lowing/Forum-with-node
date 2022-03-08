@@ -8,7 +8,8 @@ if (location.href.includes("success")) {
 }
 var socket = io();
 
-socket.on('login', function(username) {
+socket.on('login', function(username, id) {
     localStorage.setItem("username", username)
+    localStorage.setItem("id", id)
     window.location.href = "index.html"
 });

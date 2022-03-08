@@ -8,11 +8,20 @@ const mysql = require("mysql");
 const crypto = require('crypto');
 const validator = require("email-validator");
 const cookieParser = require("cookie-parser");
+// const router = express.Router();
 // const sessions = require('express-session');
 
 app.use(express.static('public'))
 app.use(cookieParser());
-
+/* final catch-all route to index.html defined last */
+app.get('/index.html', (req, res) => {
+  console.log("iconv");
+  res.send({success: true, message: '<li>New list item number 1</li><li>New list item number 2</li>'});
+})
+/* final catch-all route to index.html defined last */
+app.get('/*', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+})
 server.listen(3000, () => {
   console.log('listening on *:3000');
 });
@@ -26,6 +35,10 @@ app.post("/register", function(req, res) {
 app.post("/login", function(req, res) {
   let body = req.body;
   LoginUser(req, res, body.username, body.password)
+});
+app.post("/create_post", function(req, res) {
+  let body = req.body;
+  create_post(body.usersId, body.title, body.subject, body.content)
 });
 
 function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
@@ -93,9 +106,10 @@ function LoginUser(req, res, username, password) {
       if (result.length === 1) {
         // login success
         username = result[0].usersUid
+        id = result[0].usersId
         console.log(`user: ${username} logged in`);
         io.on('connection', (socket) => {
-          socket.emit('login', username);
+          socket.emit('login', username, id);
         });
         return res.redirect("login.html");
       }
@@ -106,4 +120,42 @@ function LoginUser(req, res, username, password) {
     });
   }); 
 }
-// nästa gång gör profil sida
+
+function create_post(id, title, subject, content) {
+  let con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "chatingV2"
+  });
+
+  con.connect(function(err) {
+    if (err) throw err;
+    // $id, $title, $subject, $content
+    sql = `INSERT INTO forums (usersId, title, subject, content) VALUES (${id}, '${title}', '${subject}', '${content}');`
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      console.log(result);
+
+    });
+  }); 
+}
+function get_all_posts(res) {
+  let con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "chatingV2"
+  });
+
+  con.connect(function(err) {
+    if (err) throw err;
+    // $id, $title, $subject, $content
+    sql = "SELECT * FROM `forums`";
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      console.log(result);
+      res.send(result);
+    });
+  }); 
+}

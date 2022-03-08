@@ -21,9 +21,29 @@
 				<button id="register" class="button-36" role="button"><a href="register.html">Register</a></button>
 			</div>
 		</header>
-		<div class="title">
-			<h1>Forum made with node.js</h1>
+	
+		<div class="container">
+			<div class="title">
+				<h1>Forum made with node.js</h1>
+			</div>
+			<button id="myBtn">Skapa inlägg</button>
+			<h2>Forums:</h2>
+			<div class="posts"></div>
 		</div>
+		  <div id="myModal" class="modal">
+			<!-- Modal content -->
+			<div class="modal-content">
+			  <span class="close">&times;</span>
+			  <form action="create_post" method="POST">
+				<input type="hidden" name="usersId" id="usersId" value="">
+				<input type="text" name="title" placeholder="Title..."><br>
+				<input type="text" name="subject" placeholder="Subject..."><br>
+				<input type="text" name="content" placeholder="Content..."><br>
+				<button type="submit" name="submit">Post</button>
+			  </form>
+			</div>
+	  
+		  </div>
 		<div class="userdiv"></div>
 		<!-- jQuery library -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
