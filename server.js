@@ -20,9 +20,9 @@ app.post('/change',function(req,res){
   get_all_posts(res);
 });
 
-/* final catch-all route to index.html defined last */
+// final catch-all route to '/'
 app.get('/*', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+  res.redirect('/');
 })
 server.listen(3000, () => {
   console.log('listening on *:3000');
@@ -139,7 +139,7 @@ function create_post(usersName, title, subject, content, res) {
     con.query(sql, function (err, result) {
       if (err) throw err;
       console.log(result);
-      return res.redirect("index.html")
+      return res.redirect("/")
     });
   }); 
 }
@@ -157,7 +157,7 @@ function get_all_posts(res) {
     sql = "SELECT * FROM `forums`";
     con.query(sql, function (err, result) {
       if (err) throw err;
-      console.log(result);
+      // console.log(result);
       let html = "";
       result.forEach(element => {
         html += `

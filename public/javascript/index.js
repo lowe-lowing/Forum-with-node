@@ -18,7 +18,7 @@ function toggleLoggedIn(login) {
     var loggedin = document.querySelector(".loggedin");
     var notloggedin = document.querySelector(".notloggedin");
     var hiddeninput = document.querySelector("#usersName");
-    document.querySelector(".btnDiv").innerHTML = login ? '<button id="myBtn">make post</button>' : ""
+    document.querySelector(".btnDiv").innerHTML = login ? '<button id="myBtn">make post</button>' : '<p style="color: red;">Log in to make a post</p>'
     if (login == true) {
         loggedin.style.display = "block";
         notloggedin.style.display = "none";
