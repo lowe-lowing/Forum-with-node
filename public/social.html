@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Login Form Tutorial</title>
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+		<header>
+			<div class="social-link">
+				<h2><a href="./social.html">social</a></h2>
+			</div>
+			<div class="account-header">
+				<!-- logged in -->
+				<div class="loggedin" style="display: none;">
+					<a href="profile.html">
+						<div class="pfp"><img src="/images/default_pfp.jpg" alt="default profile public"></div>
+						<div class="username"></div>
+					</a>
+					<button id="logout" class="button-36" role="button" onclick="logout()">Logout</button>
+				</div>
+				<!-- not logged in -->
+				<div class="notloggedin" style="display: none;">
+					<button id="login" class="button-36" role="button"><a href="login.html">Login</a></button>
+					<button id="register" class="button-36" role="button"><a href="register.html">Register</a></button>
+				</div>
+			</div>
+		</header>
+	
+		<div class="container">
+			<div class="title">
+				<h1>Forum made with node.js</h1>
+			</div>
+        </div>
+        <div class="userdiv"></div>
+		<!-- jQuery library -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+		<!-- egen javascript -->
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="javascript/social.js"></script>
+	
+		<!-- Popper JS -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	
+		<!-- Latest compiled JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	</body>
+</html>

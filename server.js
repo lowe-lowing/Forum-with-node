@@ -7,12 +7,8 @@ const io = new Server(server);
 const mysql = require("mysql");
 const crypto = require('crypto');
 const validator = require("email-validator");
-const cookieParser = require("cookie-parser");
-// const router = express.Router();
-// const sessions = require('express-session');
 
 app.use(express.static('public'))
-app.use(cookieParser());
 
 app.post('/change',function(req,res){
   // the message being sent back will be saved in a localSession variable
@@ -20,7 +16,7 @@ app.post('/change',function(req,res){
   get_all_posts(res);
 });
 
-// final catch-all route to '/'
+// final catch-all route to '/' 
 app.get('/*', (req, res) => {
   res.redirect('/');
 })

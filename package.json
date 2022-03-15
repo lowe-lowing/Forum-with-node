@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "email-validator": "^2.0.4",
+    "express": "^4.17.3",
+    "http": "^0.0.1-security",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.15",
+    "socket.io": "^4.4.1",
+    "validator": "^13.7.0"
+  },
+  "scripts": {
+    "serve": "nodemon server.js"
+  }
+}
