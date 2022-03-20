@@ -30,7 +30,7 @@ app.post("/register", function(req, res) {
   CreateUser(res, body.name, body.email, body.username, body.password)
 });
 
-app.post("/login", function(req, res) {
+app.post("/login_user", function(req, res) {
   let body = req.body;
   LoginUser(req, res, body.username, body.password)
 });
@@ -38,6 +38,11 @@ app.post("/create_post", function(req, res) {
   let body = req.body;
   create_post(body.creator, body.title, body.subject, body.content, res)
 });
+app.post("/searchUsers", function(req,res) {
+  let search = req.body.search
+  // console.log(search);
+  searchUsers(res, search)
+})
 
 function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
   let con = mysql.createConnection({
@@ -85,8 +90,9 @@ function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
     });
   }); 
 }
-
+let loggingIn = false
 function LoginUser(req, res, username, password) {
+  loggingIn = true
   let con = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -108,7 +114,13 @@ function LoginUser(req, res, username, password) {
         var id = result[0].usersId
         console.log(`user: ${username} logged in`);
         io.on('connection', (socket) => {
-          socket.emit('login', username, id, usersName);
+          socket.on('logout',function (data) {
+            loggingIn = false
+            console.log(`user with id: '${data}' logged out`)
+          });
+          if (loggingIn) {
+            socket.emit('login', username, id, usersName);
+          }
         });
         return res.redirect("login.html");
       }
@@ -147,6 +159,7 @@ function get_all_posts(res) {
     database: "chatingV2"
   });
 
+  // console.log("getting all posts");
   con.connect(function(err) {
     if (err) throw err;
     // $id, $title, $subject, $content
@@ -164,6 +177,37 @@ function get_all_posts(res) {
           <div class="post-creator">Creator: ${element.publisher}</div>
         </div><br>`
       });
+      res.send({success: true, message: html});
+    });
+  }); 
+}
+
+function searchUsers(res, search) {
+  let con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "chatingV2"
+  });
+
+  // console.log("getting all posts");
+  con.connect(function(err) {
+    if (err) throw err;
+    // $id, $title, $subject, $content
+    sql = `SELECT * FROM users WHERE (usersUid = '${search}');`;
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      // console.log(result);
+      let html = "";
+      if (result.length > 0) {
+        result.forEach(element => {
+          html += `
+          <div>${element.usersUid}</div><br>`
+        });
+      }
+      else {
+        html="no user found"
+      }
       res.send({success: true, message: html});
     });
   }); 

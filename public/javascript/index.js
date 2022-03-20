@@ -27,6 +27,7 @@ function toggleLoggedIn(login) {
         loggedin.style.display = "none";
         notloggedin.style.display = "block";
         hiddeninput.value = "";
+        socket.emit("logout", localStorage.getItem("id"))
         localStorage.removeItem("username")
         localStorage.removeItem("id")
         localStorage.removeItem("usersName")

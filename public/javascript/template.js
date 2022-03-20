@@ -18,6 +18,7 @@ function toggleLoggedIn(login) {
     } else {
         loggedin.style.display = "none";
         notloggedin.style.display = "block";
+        socket.emit("logout", localStorage.getItem("id"))
         localStorage.removeItem("username")
         localStorage.removeItem("id")
         localStorage.removeItem("usersName")
