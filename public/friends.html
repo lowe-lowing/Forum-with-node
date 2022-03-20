@@ -26,45 +26,28 @@
 
 		<div class="nav">
 			<div class="rec">Menu</div>
-
+		
 			<div class="menu">
-				<div class="sidebar-btn"><a href="./index.html">Forums</a></div>
-				<div class="sidebar-btn"><a href="./friends.html">Friends</a></div>
-				<div class="sidebar-btn"><a href="./addfriend.html">Add Friends</a></div>
-				<div class="sidebar-btn"><a href="./conversations.html">Conversations</a></div>
+			  <div class="sidebar-btn"><a href="./index.html">Forums</a></div>
+			  <div class="sidebar-btn"><a href="./friends.html">Friends</a></div>
+			  <div class="sidebar-btn"><a href="./addfriend.html">Add Friends</a></div>
+			  <div class="sidebar-btn"><a href="./conversations.html">Conversations</a></div>
 			</div>
 		
 		</div>
 	
 		<div id="container">
 			<div class="title">
-				<h1>Forum made with node</h1>
+				<h1>Social</h1>
 			</div>
-			<div class="btnDiv"></div>
-			<h2>Posts:</h2>
-			<div class="posts"></div>
-		</div>
-		  <div id="myModal" class="modal">
-			<!-- Modal content -->
-			<div class="modal-content">
-			  <span class="close">&times;</span>
-			  <form action="create_post" method="POST">
-				<input type="hidden" name="creator" id="usersName" value="">
-				<input type="text" name="title" placeholder="Title..."><br>
-				<input type="text" name="subject" placeholder="Subject..."><br>
-				<input type="text" name="content" placeholder="Content..."><br>
-				<button type="submit" name="submit">Post</button>
-			  </form>
-			</div>
-	  
-		  </div>
-		<div class="userdiv"></div>
+        </div>
+        <div class="userdiv"></div>
 		<!-- jQuery library -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 		<!-- egen javascript -->
 		<script src="/socket.io/socket.io.js"></script>
-		<script src="javascript/index.js"></script>
+		<script src="javascript/social.js"></script>
 	
 		<!-- Popper JS -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>

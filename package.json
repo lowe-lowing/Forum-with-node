@@ -10,6 +10,6 @@
     "validator": "^13.7.0"
   },
   "scripts": {
-    "serve": "nodemon server.js"
+    "server": "nodemon server.js"
   }
 }

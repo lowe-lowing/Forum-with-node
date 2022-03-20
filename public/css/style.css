@@ -49,18 +49,9 @@ h2 a {
   text-decoration: none;
   color: #000;
 }
-h2 a:hover, h2 a:focus, h2 a:active {
-  text-decoration: none;
-  color: #000;
-  font-size: 26px;
-}
-a, a:hover, a:focus, a:active {
+.button-36 a, .button-36 a:hover, .button-36 a:focus, .button-36 a:active {
     text-decoration: none;
     color: white;
-}
-.social-link h2 {
-  margin: 0;
-  padding: 0;
 }
 header {
   display: flex;
@@ -162,3 +153,64 @@ header {
     text-decoration: none;
     cursor: pointer;
   }
+.nav {
+  width: 14%;
+  margin: 75px 20px 20px 20px;
+  padding: 0;
+  float: left;
+}
+.nav .rec {
+  font-size: xx-large;
+  background-color: white;
+  text-align: center;
+  font-weight: bold;
+  text-decoration: underline;
+  padding: 5px;
+  border-radius: 10px;
+}
+.menu {
+  background-color: white;
+  border: red solid 2px;
+  margin-top: 10px;
+  z-index: 0;
+    
+}
+.menu button {
+  background-color:white;
+  display: block;
+  padding: 7px 7px;
+  margin-left: 20px;
+  font-size: medium;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+.sidebar-btn {
+  display: block;
+  text-decoration: none;
+  padding: 10px;
+  padding-left: 20px;
+  font-size: medium;
+  outline: none;
+  font-size: x-large;
+}
+.sidebar-btn a {
+  text-decoration: none;
+  color: black;
+}
+.sidebar-btn a:hover {
+ color: red;
+}
+.fa-caret-down {
+  float: right;
+  padding-right: 8px;
+}
+.active {
+  background-color: rgba(119, 119, 119, 0.274);
+}
+#container {
+  background-color: white;
+  width: 60vw;
+  margin: 20px auto 10px auto;
+  padding-bottom: 1px;
+}
