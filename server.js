@@ -7,6 +7,8 @@ const io = new Server(server);
 const mysql = require("mysql");
 const crypto = require('crypto');
 const validator = require("email-validator");
+const { json } = require('express/lib/response');
+const res = require('express/lib/response');
 
 app.use(express.static('public'))
 
@@ -40,8 +42,17 @@ app.post("/create_post", function(req, res) {
 });
 app.post("/searchUsers", function(req,res) {
   let search = req.body.search
+  let id = req.body.id
   // console.log(search);
-  searchUsers(res, search)
+  searchUsers(res, search, id)
+})
+app.post("/send_friendRqst", function(req,res) {
+  let body = req.body
+  send_friendRqst(body.id, body.userId, res)
+})
+app.post("/getFriends", function(req,res) {
+  let id = req.body.loggedinId
+  getFriends(id, res)
 })
 
 function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
@@ -182,7 +193,7 @@ function get_all_posts(res) {
   }); 
 }
 
-function searchUsers(res, search) {
+function searchUsers(res, search, id) {
   let con = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -201,8 +212,15 @@ function searchUsers(res, search) {
       let html = "";
       if (result.length > 0) {
         result.forEach(element => {
-          html += `
-          <div>${element.usersUid}</div><br>`
+          if (id != element.usersId) {
+            html += `
+              <div>${element.usersUid}</div>
+              <form action="send_friendRqst" method="POST">
+                <input type="hidden" name="id" value="${element.usersId}">
+                <input type="hidden" name="userId" value="${id}">
+                <input type="submit" value="Send friend request" >
+              </form><br>`
+          }
         });
       }
       else {
@@ -211,4 +229,50 @@ function searchUsers(res, search) {
       res.send({success: true, message: html});
     });
   }); 
+}
+
+function send_friendRqst(id, userId, res) {
+  // id = logged in user
+  // userId = the user to send friend request to
+  let con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "chatingV2",
+    multipleStatements: true
+  });
+
+  con.connect(function(err) {
+    if (err) throw err;
+
+    sql = `
+    UPDATE users SET friendRqstsSentTo = '${id}' WHERE usersId = ${userId};
+    UPDATE users SET friendRqstsRecievedFrom = '${userId}' WHERE usersId = ${id};`
+
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      res.redirect("/addfriend.html")
+    });
+  });
+}
+
+function getFriends(id, res) {
+  let con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "chatingV2",
+    multipleStatements: true
+  });
+
+  con.connect(function(err) {
+    if (err) throw err;
+
+    sql = `SELECT friends, friendRqstsSentTo, friendRqstsRecievedFrom FROM users WHERE (usersId = ${id})`
+
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      res.send({success: true, message: result})
+    });
+  });
 }

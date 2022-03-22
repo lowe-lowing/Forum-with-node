@@ -1,3 +1,4 @@
+// template
 var socket = io();
 
 var username = localStorage.getItem("username")

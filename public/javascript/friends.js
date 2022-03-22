@@ -31,27 +31,31 @@ function logout() {
     console.log("logged out");
 }
 // end of template
-document.querySelector(".searchBtn").addEventListener("click", searchForUser);
-
-function searchForUser() {
-    var input = document.querySelector(".searchInput").value
+getFriendRequests()
+function getFriendRequests() {
     var id = localStorage.getItem("id")
-    console.log(input);
-    // ajax call
     var jsonObj = { 
-        search: input,
-        id: id
+        loggedinId: id,
     }
     $.ajax({
-        url: 'http://localhost:3000/searchUsers',
+        url: 'http://localhost:3000/getFriends',
         method: 'POST',
         data: jsonObj
     }).done(function(data){
         //if we have a successful post request ... 
         if(data.success){
-            console.log(data);
-            document.querySelector(".resultDiv").innerHTML = data.message
             console.log("succes");
+            console.log(data.message[0].friendRqstsSentTo);
+            friendRequestsTable = document.querySelector(".table-friendRequests")
+            console.log(friendRequestsTable);
+            // console.log("Sent");
+            // for (var i = 1, row; row = friendRequestsTable.rows[i]; i++) {
+            //     console.log(row.cells[0].textContent);
+            //  }
+            // console.log("Recieved");
+            // for (var i = 1, row; row = friendRequestsTable.rows[i]; i++) {
+            //     console.log(row.cells[1].textContent);
+            // }
             return;
         }
     }).fail(function(){
