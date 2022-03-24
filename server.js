@@ -54,6 +54,13 @@ app.post("/getFriends", function(req,res) {
   let id = req.body.loggedinId
   getFriends(id, res)
 })
+app.post("/getAllUsers", function(req,res) {
+  getAllUsers(res)
+})
+app.post("/acceptFriendRequest", function(req,res) {
+  body = req.body
+  acceptFriendRequest(body.user1, body.user2, res)
+})
 
 function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
   let con = mysql.createConnection({
@@ -246,8 +253,8 @@ function send_friendRqst(id, userId, res) {
     if (err) throw err;
 
     sql = `
-    UPDATE users SET friendRqstsSentTo = '${id}' WHERE usersId = ${userId};
-    UPDATE users SET friendRqstsRecievedFrom = '${userId}' WHERE usersId = ${id};`
+    UPDATE users SET friendRqstsSentTo = '${id}' WHERE (usersId = ${userId}) AND (NOT friendRqstsSentTo LIKE '%${id}%');
+    UPDATE users SET friendRqstsRecievedFrom = '${userId}' WHERE (usersId = ${id}) AND (NOT friendRqstsRecievedFrom LIKE '%${userId}%');`
 
     con.query(sql, function (err, result) {
       if (err) throw err;
@@ -262,7 +269,6 @@ function getFriends(id, res) {
     user: "root",
     password: "",
     database: "chatingV2",
-    multipleStatements: true
   });
 
   con.connect(function(err) {
@@ -273,6 +279,64 @@ function getFriends(id, res) {
     con.query(sql, function (err, result) {
       if (err) throw err;
       res.send({success: true, message: result})
+    });
+  });
+}
+
+function getAllUsers(res) {
+  let con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "chatingV2",
+  });
+
+  con.connect(function(err) {
+    if (err) throw err;
+
+    sql = `SELECT * FROM users`
+
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      res.send({success: true, message: result})
+    });
+  });
+}
+function acceptFriendRequest(user1, user2, res) {
+  let con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "chatingV2",
+    multipleStatements: true
+  });
+
+  con.connect(function(err) {
+    if (err) throw err;
+
+    sql1 = `
+    SELECT friends, friendRqstsSentTo, friendRqstsRecievedFrom FROM users WHERE (usersId = ${user1}) OR (usersId = ${user2});`
+
+    con.query(sql1, function (err, result) {
+      if (err) throw err;
+      user1Friends = result[0].friends + user2
+      user2Friends = result[1].friends + user1
+      user1Sent = result[0].friendRqstsSentTo.replace(user2, "")
+      user2Sent = result[1].friendRqstsSentTo.replace(user1, "")
+      user1Recieved = result[0].friendRqstsRecievedFrom.replace(user2, "")
+      user2Recieved = result[1].friendRqstsRecievedFrom.replace(user1, "")
+      sql2 = `
+        UPDATE users SET friends = '${user1Friends}' WHERE (usersId = ${user1});
+        UPDATE users SET friends = '${user2Friends}' WHERE (usersId = ${user2});
+        UPDATE users SET friendRqstsSentTo = '${user1Sent}' WHERE (usersId = ${user1});
+        UPDATE users SET friendRqstsSentTo = '${user2Sent}' WHERE (usersId = ${user2});
+        UPDATE users SET friendRqstsRecievedFrom = '${user1Recieved}' WHERE (usersId = ${user1});
+        UPDATE users SET friendRqstsRecievedFrom = '${user2Recieved}' WHERE (usersId = ${user2});`
+      
+        con.query(sql2, function (err, result) {
+          if (err) throw err;
+          res.redirect("/friends.html")
+        });
     });
   });
 }

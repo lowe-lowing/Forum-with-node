@@ -71,10 +71,7 @@ function changeDom(){
             if(data.success){
                 //change the DOM &
                 //set the data in local storage to persist upon page request
-                localStorage.setItem("permanentData", data.message);
-                var savedText = localStorage.getItem("permanentData");
-                document.querySelector(".posts").innerHTML = savedText
-
+                document.querySelector(".posts").innerHTML = data.message
                 return;
             }
         }).fail(function(){

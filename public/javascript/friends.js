@@ -31,8 +31,9 @@ function logout() {
     console.log("logged out");
 }
 // end of template
-getFriendRequests()
-function getFriendRequests() {
+var users;
+getAllUsers()
+async function getFriends() {
     var id = localStorage.getItem("id")
     var jsonObj = { 
         loggedinId: id,
@@ -44,23 +45,77 @@ function getFriendRequests() {
     }).done(function(data){
         //if we have a successful post request ... 
         if(data.success){
-            console.log("succes");
-            console.log(data.message[0].friendRqstsSentTo);
-            friendRequestsTable = document.querySelector(".table-friendRequests")
-            console.log(friendRequestsTable);
-            // console.log("Sent");
-            // for (var i = 1, row; row = friendRequestsTable.rows[i]; i++) {
-            //     console.log(row.cells[0].textContent);
-            //  }
-            // console.log("Recieved");
-            // for (var i = 1, row; row = friendRequestsTable.rows[i]; i++) {
-            //     console.log(row.cells[1].textContent);
-            // }
+            var sentTable = document.querySelector(".table-friendRequestsSent")
+            var fromTable = document.querySelector(".table-friendRequestsFrom")
+            var friendsTable = document.querySelector(".table-friends")
+            // get all ids in data.message[0] 
+            // foreach id make ajax call to find username and add new tr
+            for (let i = 1; i < sentTable.rows.length; i++) {
+                const element = sentTable.rows[i];
+                console.log(element);
+            }
+            data.message[0].friendRqstsSentTo.split("").forEach((id, i) => {
+                var username;
+                users.forEach(user => {
+                    if (user.usersId == id) {
+                        username = user.usersUid;
+                    }
+                });
+                sentTable.insertRow(i+1).insertCell(0).innerHTML = username
+            });
+            data.message[0].friendRqstsRecievedFrom.split("").forEach((id, i) => {
+                var username;
+                users.forEach(user => {
+                    if (user.usersId == id) {
+                        username = user.usersUid;
+                    }
+                });
+                fromTable.insertRow(i+1).insertCell(0).innerHTML = `${username} 
+                <form action="/acceptFriendRequest" method="POST">
+                    <input type="hidden" name="user1" value="${id}">
+                    <input type="hidden" name="user2" value="${localStorage.getItem("id")}">
+                    <button type="submit">Accept</button>
+                </form>`
+            });
+            data.message[0].friends.split("").forEach((id, i) => {
+                var username;
+                users.forEach(user => {
+                    if (user.usersId == id) {
+                        username = user.usersUid;
+                    }
+                });
+                friendsTable.insertRow(i+1).insertCell(0).innerHTML = username
+            });
             return;
         }
     }).fail(function(){
         //do nothing ....
         console.log('failed...');
         return;
+    });
+}
+
+function getAllUsers() {
+    $.ajax({
+        url: 'http://localhost:3000/getAllUsers',
+        method: 'POST',
+    }).done(function(data){
+        //if we have a successful post request ... 
+        if(data.success){
+            users = data.message
+            getFriends()
+        }
+    }).fail(function(){
+        //do nothing ....
+        console.log('failed...');
+        return;
+    });
+}
+
+function getUserFromId(id) {
+    users.forEach(user => {
+        if (user.usersId == id) {
+            return user.usersUid;
+        }
     });
 }
