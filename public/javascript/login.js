@@ -11,13 +11,13 @@ var socket = io();
 
 document.querySelector('input[type="submit"]').onclick = function() {
     console.log("bruh");
-    socket.emit("loggingIn")
+    // socket.emit("loggingIn")
 }
 
-socket.on('login', function(username, id, name) {
-    console.log(username);
-    localStorage.setItem("username", username)
-    localStorage.setItem("id", id)
-    localStorage.setItem("usersName", name)
-    window.location.href = "index.html"
-});
+// socket.on('login', function(username, id, name) {
+//     console.log(username);
+//     localStorage.setItem("username", username)
+//     localStorage.setItem("id", id)
+//     localStorage.setItem("usersName", name)
+//     window.location.href = "index.html"
+// });

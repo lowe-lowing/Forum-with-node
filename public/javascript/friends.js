@@ -31,7 +31,7 @@ function logout() {
     console.log("logged out");
 }
 // end of template
-var users;
+let users;
 getAllUsers()
 async function getFriends() {
     var id = localStorage.getItem("id")
@@ -39,7 +39,7 @@ async function getFriends() {
         loggedinId: id,
     }
     $.ajax({
-        url: 'http://localhost:3000/getFriends',
+        url: '/getFriends',
         method: 'POST',
         data: jsonObj
     }).done(function(data){
@@ -97,7 +97,7 @@ async function getFriends() {
 
 function getAllUsers() {
     $.ajax({
-        url: 'http://localhost:3000/getAllUsers',
+        url: '/getAllUsers',
         method: 'POST',
     }).done(function(data){
         //if we have a successful post request ... 

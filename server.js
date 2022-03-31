@@ -7,14 +7,21 @@ const io = new Server(server);
 const mysql = require("mysql");
 const crypto = require('crypto');
 const validator = require("email-validator");
-const { json } = require('express/lib/response');
-const res = require('express/lib/response');
+const cors = require('cors');
+const session = require('express-session');
 
 app.use(express.static('public'))
+app.use(cors());
+app.use(session({
+	secret: 'secret',
+	resave: true,
+	saveUninitialized: true
+}));
+
+
 
 app.post('/change',function(req,res){
-  // the message being sent back will be saved in a localSession variable
-  // send back a couple list items to be added to the DOM
+  console.log(req.session);
   get_all_posts(res);
 });
 
@@ -61,6 +68,16 @@ app.post("/acceptFriendRequest", function(req,res) {
   body = req.body
   acceptFriendRequest(body.user1, body.user2, res)
 })
+app.post("/check_loggedIn", function(req,res) {
+  console.log(req.session);
+  if (req.session.loggedIn) {
+    res.send({success: true, message: req.session.username});
+  }
+  else {
+    res.send({success: false})
+  }
+})
+// nästa gång gör så att när man loggar ut så ändras session.loggedIn till false
 
 function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
   let con = mysql.createConnection({
@@ -131,16 +148,11 @@ function LoginUser(req, res, username, password) {
         var usersName = result[0].usersName
         var id = result[0].usersId
         console.log(`user: ${username} logged in`);
-        io.on('connection', (socket) => {
-          socket.on('logout',function (data) {
-            loggingIn = false
-            console.log(`user with id: '${data}' logged out`)
-          });
-          if (loggingIn) {
-            socket.emit('login', username, id, usersName);
-          }
-        });
-        return res.redirect("login.html");
+        req.session.loggedIn = true;
+        req.session.usersId = id;
+        req.session.username = username;
+        console.log(req.session);
+        return res.redirect("index.html");
       }
       else {
         // login failed
@@ -274,7 +286,7 @@ function getFriends(id, res) {
   con.connect(function(err) {
     if (err) throw err;
 
-    sql = `SELECT friends, friendRqstsSentTo, friendRqstsRecievedFrom FROM users WHERE (usersId = ${id})`
+    var sql = `SELECT friends, friendRqstsSentTo, friendRqstsRecievedFrom FROM users WHERE (usersId = ${id});`
 
     con.query(sql, function (err, result) {
       if (err) throw err;
@@ -303,6 +315,7 @@ function getAllUsers(res) {
   });
 }
 function acceptFriendRequest(user1, user2, res) {
+  console.log(user1, user2);
   let con = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -314,24 +327,23 @@ function acceptFriendRequest(user1, user2, res) {
   con.connect(function(err) {
     if (err) throw err;
 
-    sql1 = `
-    SELECT friends, friendRqstsSentTo, friendRqstsRecievedFrom FROM users WHERE (usersId = ${user1}) OR (usersId = ${user2});`
+    sql1 = `SELECT usersId, friends, friendRqstsSentTo, friendRqstsRecievedFrom FROM users WHERE (usersId = ${user1}) OR (usersId = ${user2});`
 
     con.query(sql1, function (err, result) {
       if (err) throw err;
-      user1Friends = result[0].friends + user2
-      user2Friends = result[1].friends + user1
-      user1Sent = result[0].friendRqstsSentTo.replace(user2, "")
-      user2Sent = result[1].friendRqstsSentTo.replace(user1, "")
-      user1Recieved = result[0].friendRqstsRecievedFrom.replace(user2, "")
-      user2Recieved = result[1].friendRqstsRecievedFrom.replace(user1, "")
+      user1Friends = result[0].friends + result[1].usersId
+      user2Friends = result[1].friends + result[0].usersId
+      user1Sent = result[0].friendRqstsSentTo.replace(result[1].usersId, "")
+      user2Sent = result[1].friendRqstsSentTo.replace(result[0].usersId, "")
+      user1Recieved = result[0].friendRqstsRecievedFrom.replace(result[1].usersId, "")
+      user2Recieved = result[1].friendRqstsRecievedFrom.replace(result[0].usersId, "")
       sql2 = `
-        UPDATE users SET friends = '${user1Friends}' WHERE (usersId = ${user1});
-        UPDATE users SET friends = '${user2Friends}' WHERE (usersId = ${user2});
-        UPDATE users SET friendRqstsSentTo = '${user1Sent}' WHERE (usersId = ${user1});
-        UPDATE users SET friendRqstsSentTo = '${user2Sent}' WHERE (usersId = ${user2});
-        UPDATE users SET friendRqstsRecievedFrom = '${user1Recieved}' WHERE (usersId = ${user1});
-        UPDATE users SET friendRqstsRecievedFrom = '${user2Recieved}' WHERE (usersId = ${user2});`
+        UPDATE users SET friends = '${user1Friends}' WHERE (usersId = ${result[0].usersId});
+        UPDATE users SET friends = '${user2Friends}' WHERE (usersId = ${result[1].usersId});
+        UPDATE users SET friendRqstsSentTo = '${user1Sent}' WHERE (usersId = ${result[0].usersId});
+        UPDATE users SET friendRqstsSentTo = '${user2Sent}' WHERE (usersId = ${result[1].usersId});
+        UPDATE users SET friendRqstsRecievedFrom = '${user1Recieved}' WHERE (usersId = ${result[0].usersId});
+        UPDATE users SET friendRqstsRecievedFrom = '${user2Recieved}' WHERE (usersId = ${result[1].usersId});`
       
         con.query(sql2, function (err, result) {
           if (err) throw err;

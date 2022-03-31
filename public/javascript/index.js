@@ -2,14 +2,32 @@ var socket = io();
 
 changeDom()
 
-var username = localStorage.getItem("username")
-if (username === null) {
-    logout()
-}
-else {
-    toggleLoggedIn(true)
-    document.querySelector(".username").innerHTML = `${username}`
-}
+// make ajax request
+$.ajax({
+    url: '/check_loggedIn',
+    method:'POST',
+    data: {list: "som"}
+}).done(function(data){
+    if(data.success){
+        toggleLoggedIn(true)
+        document.querySelector(".username").innerHTML = data.message
+    } 
+    else {
+        logout()
+    }
+}).fail(function(){
+    console.log('failed...');
+    return;
+});
+
+// var username = localStorage.getItem("username")
+// if (username === null) {
+//     logout()
+// }
+// else {
+//     toggleLoggedIn(true)
+//     document.querySelector(".username").innerHTML = `${username}`
+// }
 // if(window.localStorage.permanentData){
 //     document.querySelector(".posts").innerHTML = window.localStorage.permanentData;
 // }
@@ -63,7 +81,7 @@ window.onclick = function(event) {
 function changeDom(){
     //ajax call
     $.ajax({
-            url: 'http://localhost:3000/change',
+            url: '/change',
             method:'POST',
             data: {list: "some info"}
         }).done(function(data){

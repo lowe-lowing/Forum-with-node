@@ -43,7 +43,7 @@ function searchForUser() {
         id: id
     }
     $.ajax({
-        url: 'http://localhost:3000/searchUsers',
+        url: '/searchUsers',
         method: 'POST',
         data: jsonObj
     }).done(function(data){
