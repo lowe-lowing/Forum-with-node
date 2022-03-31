@@ -1,51 +1,62 @@
-// template
-var socket = io();
+$.ajax({
+    url: '/check_loggedIn',
+    method:'POST',
+    data: {list: "som"}
+}).done(function(data){
+    if(data.isloggedIn){
+        // log in
+        toggleLoggedIn(true, data.user)
+    }
+    else {
+        toggleLoggedIn(false, data.user)
+    }
+}).fail(function(){
+    console.log('failed...');
+    return;
+});
 
-var username = localStorage.getItem("username")
-if (username === null) {
-    logout()
-}
-else {
-    toggleLoggedIn(true)
-    document.querySelector(".username").innerHTML = `${username}`
-}
-
-function toggleLoggedIn(login) {
+function toggleLoggedIn(login, user) {
     var loggedin = document.querySelector(".loggedin");
     var notloggedin = document.querySelector(".notloggedin");
     if (login == true) {
         loggedin.style.display = "block";
         notloggedin.style.display = "none";
+        document.querySelector(".username").innerHTML = user.username
     } else {
         loggedin.style.display = "none";
         notloggedin.style.display = "block";
-        socket.emit("logout", localStorage.getItem("id"))
-        localStorage.removeItem("username")
-        localStorage.removeItem("id")
-        localStorage.removeItem("usersName")
+        document.querySelector("#container").innerHTML = "Login to view this page";
     }
 }
 
 function logout() {
     toggleLoggedIn(false)
-    console.log("logged out");
+    // log out user on the server side
+    $.ajax({
+        url: '/logout_user',
+        method:'POST',
+    }).done(function(data){
+        if(data.success){
+            console.log("logged out successfully");
+            return;
+        }
+    }).fail(function(){
+        console.log('failed...');
+        return;
+    });
+
 }
 // end of template
+
 document.querySelector(".searchBtn").addEventListener("click", searchForUser);
 
 function searchForUser() {
     var input = document.querySelector(".searchInput").value
-    var id = localStorage.getItem("id")
-    console.log(input);
     // ajax call
-    var jsonObj = { 
-        search: input,
-        id: id
-    }
     $.ajax({
         url: '/searchUsers',
         method: 'POST',
-        data: jsonObj
+        data: {search: input}
     }).done(function(data){
         //if we have a successful post request ... 
         if(data.success){

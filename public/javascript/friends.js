@@ -1,59 +1,64 @@
-// template
-var socket = io();
+$.ajax({
+    url: '/check_loggedIn',
+    method:'POST',
+    data: {list: "som"}
+}).done(function(data){
+    if(data.isloggedIn){
+        // log in
+        toggleLoggedIn(true, data.user)
+    }
+    else {
+        toggleLoggedIn(false, data.user)
+    }
+}).fail(function(){
+    console.log('failed...');
+    return;
+});
 
-var username = localStorage.getItem("username")
-if (username === null) {
-    logout()
-}
-else {
-    toggleLoggedIn(true)
-    document.querySelector(".username").innerHTML = `${username}`
-}
-
-function toggleLoggedIn(login) {
+function toggleLoggedIn(login, user) {
     var loggedin = document.querySelector(".loggedin");
     var notloggedin = document.querySelector(".notloggedin");
     if (login == true) {
+        getAllUsers()
         loggedin.style.display = "block";
         notloggedin.style.display = "none";
+        document.querySelector(".username").innerHTML = user.username
     } else {
         loggedin.style.display = "none";
         notloggedin.style.display = "block";
-        socket.emit("logout", localStorage.getItem("id"))
-        localStorage.removeItem("username")
-        localStorage.removeItem("id")
-        localStorage.removeItem("usersName")
+        document.querySelector("#container").innerHTML = "Login to view this page";
     }
 }
 
 function logout() {
     toggleLoggedIn(false)
-    console.log("logged out");
+    // log out user on the server side
+    $.ajax({
+        url: '/logout_user',
+        method:'POST',
+    }).done(function(data){
+        if(data.success){
+            console.log("logged out successfully");
+            return;
+        }
+    }).fail(function(){
+        console.log('failed...');
+        return;
+    });
+
 }
 // end of template
 let users;
-getAllUsers()
 async function getFriends() {
-    var id = localStorage.getItem("id")
-    var jsonObj = { 
-        loggedinId: id,
-    }
     $.ajax({
         url: '/getFriends',
         method: 'POST',
-        data: jsonObj
     }).done(function(data){
-        //if we have a successful post request ... 
         if(data.success){
             var sentTable = document.querySelector(".table-friendRequestsSent")
             var fromTable = document.querySelector(".table-friendRequestsFrom")
             var friendsTable = document.querySelector(".table-friends")
-            // get all ids in data.message[0] 
-            // foreach id make ajax call to find username and add new tr
-            for (let i = 1; i < sentTable.rows.length; i++) {
-                const element = sentTable.rows[i];
-                console.log(element);
-            }
+
             data.message[0].friendRqstsSentTo.split("").forEach((id, i) => {
                 var username;
                 users.forEach(user => {
@@ -63,6 +68,7 @@ async function getFriends() {
                 });
                 sentTable.insertRow(i+1).insertCell(0).innerHTML = username
             });
+
             data.message[0].friendRqstsRecievedFrom.split("").forEach((id, i) => {
                 var username;
                 users.forEach(user => {
@@ -73,10 +79,10 @@ async function getFriends() {
                 fromTable.insertRow(i+1).insertCell(0).innerHTML = `${username} 
                 <form action="/acceptFriendRequest" method="POST">
                     <input type="hidden" name="user1" value="${id}">
-                    <input type="hidden" name="user2" value="${localStorage.getItem("id")}">
                     <button type="submit">Accept</button>
                 </form>`
             });
+
             data.message[0].friends.split("").forEach((id, i) => {
                 var username;
                 users.forEach(user => {

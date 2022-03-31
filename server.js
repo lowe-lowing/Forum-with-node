@@ -21,7 +21,6 @@ app.use(session({
 
 
 app.post('/change',function(req,res){
-  console.log(req.session);
   get_all_posts(res);
 });
 
@@ -49,7 +48,7 @@ app.post("/create_post", function(req, res) {
 });
 app.post("/searchUsers", function(req,res) {
   let search = req.body.search
-  let id = req.body.id
+  let id = req.session.usersId
   // console.log(search);
   searchUsers(res, search, id)
 })
@@ -58,24 +57,31 @@ app.post("/send_friendRqst", function(req,res) {
   send_friendRqst(body.id, body.userId, res)
 })
 app.post("/getFriends", function(req,res) {
-  let id = req.body.loggedinId
-  getFriends(id, res)
+  getFriends(req.session.usersId, res)
 })
 app.post("/getAllUsers", function(req,res) {
   getAllUsers(res)
 })
 app.post("/acceptFriendRequest", function(req,res) {
-  body = req.body
-  acceptFriendRequest(body.user1, body.user2, res)
+  user1 = req.body.user1
+  user2 = req.session.usersId
+  acceptFriendRequest(user1, user2, res)
 })
 app.post("/check_loggedIn", function(req,res) {
-  console.log(req.session);
   if (req.session.loggedIn) {
-    res.send({success: true, message: req.session.username});
+    json = {
+        userId: req.session.usersId,
+        username: req.session.username,
+        usersName: req.session.usersName
+    }
+    res.send({isloggedIn: true, user: json});
   }
   else {
-    res.send({success: false})
+    res.send({isloggedIn: false})
   }
+})
+app.post("/logout_user", function(req,res) {
+  req.session.loggedIn = false
 })
 // nästa gång gör så att när man loggar ut så ändras session.loggedIn till false
 
@@ -151,6 +157,7 @@ function LoginUser(req, res, username, password) {
         req.session.loggedIn = true;
         req.session.usersId = id;
         req.session.username = username;
+        req.session.usersName = usersName;
         console.log(req.session);
         return res.redirect("index.html");
       }
@@ -198,7 +205,7 @@ function get_all_posts(res) {
       if (err) throw err;
       // console.log(result);
       let html = "";
-      result.forEach(element => {
+      result.reverse().forEach(element => {
         html += `
         <div class="post">
           <div class="post-title">Title: ${element.title}</div>
@@ -232,13 +239,15 @@ function searchUsers(res, search, id) {
       if (result.length > 0) {
         result.forEach(element => {
           if (id != element.usersId) {
-            html += `
-              <div>${element.usersUid}</div>
-              <form action="send_friendRqst" method="POST">
-                <input type="hidden" name="id" value="${element.usersId}">
-                <input type="hidden" name="userId" value="${id}">
-                <input type="submit" value="Send friend request" >
-              </form><br>`
+            html += `<div>${element.usersUid}</div>`
+            if (!result[0].friends.includes(id) && !result[0].friendRqstsSentTo.includes(id) && !result[0].friendRqstsRecievedFrom.includes(id)) {
+              html += 
+                `<form action="send_friendRqst" method="POST">
+                  <input type="hidden" name="id" value="${element.usersId}">
+                  <input type="hidden" name="userId" value="${id}">
+                  <input type="submit" value="Send friend request" >
+                </form><br>` 
+            }
           }
         });
       }
@@ -264,13 +273,22 @@ function send_friendRqst(id, userId, res) {
   con.connect(function(err) {
     if (err) throw err;
 
-    sql = `
-    UPDATE users SET friendRqstsSentTo = '${id}' WHERE (usersId = ${userId}) AND (NOT friendRqstsSentTo LIKE '%${id}%');
-    UPDATE users SET friendRqstsRecievedFrom = '${userId}' WHERE (usersId = ${id}) AND (NOT friendRqstsRecievedFrom LIKE '%${userId}%');`
+    sql1 = `
+    SELECT * FROM users WHERE (usersId = ${userId});
+    SELECT * FROM users WHERE (usersId = ${id})`;
 
-    con.query(sql, function (err, result) {
+    con.query(sql1, function (err, result) {
+      res1 = JSON.parse(JSON.stringify(result[0]))[0]
+      res2 = JSON.parse(JSON.stringify(result[1]))[0]
       if (err) throw err;
-      res.redirect("/addfriend.html")
+      sql2 = `
+      UPDATE users SET friendRqstsSentTo = '${res1.friendRqstsSentTo + id}' WHERE (usersId = ${userId}) AND (NOT friendRqstsSentTo LIKE '%${id}%');
+      UPDATE users SET friendRqstsRecievedFrom = '${res2.friendRqstsRecievedFrom + userId}' WHERE (usersId = ${id}) AND (NOT friendRqstsRecievedFrom LIKE '%${userId}%');`
+
+      con.query(sql2, function (err, result) {
+        if (err) throw err;
+        res.redirect("/addfriend.html")
+      });
     });
   });
 }

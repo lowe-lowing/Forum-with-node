@@ -1,32 +1,50 @@
-// template
-var socket = io();
+$.ajax({
+    url: '/check_loggedIn',
+    method:'POST',
+    data: {list: "som"}
+}).done(function(data){
+    if(data.isloggedIn){
+        // log in
+        toggleLoggedIn(true, data.user)
+    }
+    else {
+        toggleLoggedIn(false, data.user)
+    }
+}).fail(function(){
+    console.log('failed...');
+    return;
+});
 
-var username = localStorage.getItem("username")
-if (username === null) {
-    logout()
-}
-else {
-    toggleLoggedIn(true)
-    document.querySelector(".username").innerHTML = `${username}`
-}
-
-function toggleLoggedIn(login) {
+function toggleLoggedIn(login, user) {
     var loggedin = document.querySelector(".loggedin");
     var notloggedin = document.querySelector(".notloggedin");
+    var hiddeninput = document.querySelector("#usersName");
+    // var btnDiv = document.querySelector(".btnDiv")
     if (login == true) {
         loggedin.style.display = "block";
         notloggedin.style.display = "none";
+        document.querySelector(".username").innerHTML = user.username
+        hiddeninput.innerHTML = user.usersName
     } else {
         loggedin.style.display = "none";
         notloggedin.style.display = "block";
-        socket.emit("logout", localStorage.getItem("id"))
-        localStorage.removeItem("username")
-        localStorage.removeItem("id")
-        localStorage.removeItem("usersName")
     }
 }
 
 function logout() {
     toggleLoggedIn(false)
-    console.log("logged out");
+    // log out user on the server side
+    $.ajax({
+        url: '/logout_user',
+        method:'POST',
+    }).done(function(data){
+        if(data.success){
+            console.log("logged out successfully");
+            return;
+        }
+    }).fail(function(){
+        console.log('failed...');
+        return;
+    });
+
 }
