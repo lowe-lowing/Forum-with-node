@@ -85,12 +85,16 @@ async function getFriends() {
 
             data.message[0].friends.split("").forEach((id, i) => {
                 var username;
+                var id;
                 users.forEach(user => {
                     if (user.usersId == id) {
                         username = user.usersUid;
+                        id = user.usersId;
                     }
                 });
-                friendsTable.insertRow(i+1).insertCell(0).innerHTML = username
+                // make ahref
+                friendsTable.insertRow(i+1).insertCell(0).innerHTML = `${username}
+                <a href="conversations.html#${id}"><button>Send Message</button></a>`
             });
             return;
         }

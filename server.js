@@ -83,7 +83,12 @@ app.post("/check_loggedIn", function(req,res) {
 app.post("/logout_user", function(req,res) {
   req.session.loggedIn = false
 })
-// nästa gång gör så att när man loggar ut så ändras session.loggedIn till false
+// app.post("/conversation", function(req,res) {
+//   res.redirect("conversations.html")
+// })
+app.post("/getConversation", function(req,res) {
+  getConversation(req, req.body.id, res)
+})
 
 function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
   let con = mysql.createConnection({
@@ -370,3 +375,25 @@ function acceptFriendRequest(user1, user2, res) {
     });
   });
 }
+function getConversation(req, id, res) {
+  loggedInUser = req.session.usersId;
+  user2 = id
+  let con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "chatingV2",
+  });
+
+  con.connect(function(err) {
+    if (err) throw err;
+
+    sql = `SELECT * FROM storage WHERE (from_ = ${loggedInUser} OR from_ = ${user2}) AND (to_ = ${loggedInUser} OR to_ = ${user2})`
+
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      res.send({success: true, message: result})
+    });
+  });
+}
+// nästa gång strukturera om storage tabbelen i databasen. Kan ta bort Conversations tabbelen i databasen.
