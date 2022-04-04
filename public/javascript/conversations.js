@@ -19,7 +19,7 @@ function toggleLoggedIn(login, user) {
     var loggedin = document.querySelector(".loggedin");
     var notloggedin = document.querySelector(".notloggedin");
     if (login == true) {
-        getConv()
+        // getConv()
         loggedin.style.display = "block";
         notloggedin.style.display = "none";
         document.querySelector(".username").innerHTML = user.username
@@ -48,7 +48,33 @@ function logout() {
 
 }
 // end of template
+$(document).ready(function() {
+    document.querySelector(".sendBtn").addEventListener("click", sendMsg)
+});
+
+function sendMsg() {
+    var inputValue = document.querySelector(".msgInput").value;
+    if (inputValue === "") { return; }
+    $.ajax({
+        url: '/sendMsg',
+        method:'POST',
+        data: {
+            id: location.href.split('#')[1],
+            msg: inputValue
+        }
+    }).done(function(data){
+        if(data.success){
+            alert("message sent successfully!")
+            return;
+        }
+    }).fail(function(){
+        console.log('failed...');
+        return;
+    });
+}
+
 function getConv() {
+    console.log("getting conversation...");
     $.ajax({
         url: '/getConversation',
         method:'POST',
@@ -64,3 +90,4 @@ function getConv() {
         return;
     });
 }
+// <!-- make ajax call to send the message on button press -->

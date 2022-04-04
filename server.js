@@ -83,11 +83,11 @@ app.post("/check_loggedIn", function(req,res) {
 app.post("/logout_user", function(req,res) {
   req.session.loggedIn = false
 })
-// app.post("/conversation", function(req,res) {
-//   res.redirect("conversations.html")
-// })
 app.post("/getConversation", function(req,res) {
   getConversation(req, req.body.id, res)
+})
+app.post("/sendMsg", function(req,res) {
+  sendMessage(req, req.body.id, res)
 })
 
 function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
@@ -396,4 +396,26 @@ function getConversation(req, id, res) {
     });
   });
 }
+function sendMessage(req, id, res) {
+  loggedInUser = req.session.usersId;
+  user2 = id
+  let con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "chatingV2",
+  });
+
+  con.connect(function(err) {
+    if (err) throw err;
+
+    sql = `INSERT INTO storage (message, from_, to_) VALUES ('${req.body.msg}', ${loggedInUser}, ${id});`
+
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      res.send({success: true,})
+    });
+  });
+}
+
 // nästa gång strukturera om storage tabbelen i databasen. Kan ta bort Conversations tabbelen i databasen.
