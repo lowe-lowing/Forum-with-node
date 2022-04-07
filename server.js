@@ -18,8 +18,6 @@ app.use(session({
 	saveUninitialized: true
 }));
 
-
-
 app.post('/change',function(req,res){
   get_all_posts(res);
 });
@@ -30,6 +28,18 @@ app.get('/*', (req, res) => {
 })
 server.listen(3000, () => {
   console.log('listening on *:3000');
+});
+io.on("connection", (socket) => {
+  // receive a message from the client
+  socket.on("message", (data) => {
+    // send to all users 
+    // which then checks if it belongs to their conversation
+    io.emit('new message',{
+      from: data.sender,
+      to: data.reciever,
+      message: data.message
+    });
+  });
 });
 
 app.use(express.urlencoded({extended: true})); 
@@ -49,7 +59,6 @@ app.post("/create_post", function(req, res) {
 app.post("/searchUsers", function(req,res) {
   let search = req.body.search
   let id = req.session.usersId
-  // console.log(search);
   searchUsers(res, search, id)
 })
 app.post("/send_friendRqst", function(req,res) {
@@ -61,6 +70,9 @@ app.post("/getFriends", function(req,res) {
 })
 app.post("/getAllUsers", function(req,res) {
   getAllUsers(res)
+})
+app.post("/getUser", function(req, res) {
+  getUser(req.body.id, res)
 })
 app.post("/acceptFriendRequest", function(req,res) {
   user1 = req.body.user1
@@ -151,7 +163,6 @@ function LoginUser(req, res, username, password) {
     var hashedPwd = crypto.createHash('md5').update(password).digest('hex');
     con.query(`SELECT * FROM users WHERE (usersUid = '${username}' AND usersPwd = '${hashedPwd}') OR (usersEmail = '${username}' AND usersPwd = '${hashedPwd}');`, function (err, result) {
       if (err) throw err;
-      console.log(result);
       
       if (result.length === 1) {
         // login success
@@ -188,7 +199,6 @@ function create_post(usersName, title, subject, content, res) {
     sql = `INSERT INTO forums (publisher, title, subject, content) VALUES ('${usersName}', '${title}', '${subject}', '${content}');`
     con.query(sql, function (err, result) {
       if (err) throw err;
-      console.log(result);
       return res.redirect("/")
     });
   }); 
@@ -201,14 +211,12 @@ function get_all_posts(res) {
     database: "chatingV2"
   });
 
-  // console.log("getting all posts");
   con.connect(function(err) {
     if (err) throw err;
     // $id, $title, $subject, $content
     sql = "SELECT * FROM `forums`";
     con.query(sql, function (err, result) {
       if (err) throw err;
-      // console.log(result);
       let html = "";
       result.reverse().forEach(element => {
         html += `
@@ -232,14 +240,12 @@ function searchUsers(res, search, id) {
     database: "chatingV2"
   });
 
-  // console.log("getting all posts");
   con.connect(function(err) {
     if (err) throw err;
     // $id, $title, $subject, $content
     sql = `SELECT * FROM users WHERE (usersUid = '${search}');`;
     con.query(sql, function (err, result) {
       if (err) throw err;
-      // console.log(result);
       let html = "";
       if (result.length > 0) {
         result.forEach(element => {
@@ -317,7 +323,24 @@ function getFriends(id, res) {
     });
   });
 }
+function getUser(id, res) {
+  let con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "chatingV2",
+  });
 
+  con.connect(function(err) {
+    if (err) throw err;
+
+    sql = `SELECT * FROM users where usersId = ${id}`
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      res.send(result)
+    });
+  });
+}
 function getAllUsers(res) {
   let con = mysql.createConnection({
     host: "localhost",
@@ -338,7 +361,6 @@ function getAllUsers(res) {
   });
 }
 function acceptFriendRequest(user1, user2, res) {
-  console.log(user1, user2);
   let con = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -377,6 +399,7 @@ function acceptFriendRequest(user1, user2, res) {
 }
 function getConversation(req, id, res) {
   loggedInUser = req.session.usersId;
+  if (loggedInUser == undefined) { return; }
   user2 = id
   let con = mysql.createConnection({
     host: "localhost",
@@ -392,7 +415,7 @@ function getConversation(req, id, res) {
 
     con.query(sql, function (err, result) {
       if (err) throw err;
-      res.send({success: true, message: result})
+      res.send({success: true, loggedInUserId: loggedInUser, messages: result})
     });
   });
 }
@@ -404,6 +427,7 @@ function sendMessage(req, id, res) {
     user: "root",
     password: "",
     database: "chatingV2",
+    multipleStatements: true
   });
 
   con.connect(function(err) {
@@ -413,9 +437,7 @@ function sendMessage(req, id, res) {
 
     con.query(sql, function (err, result) {
       if (err) throw err;
-      res.send({success: true,})
+      res.send({success: true, message: result})
     });
   });
 }
-
-// nästa gång strukturera om storage tabbelen i databasen. Kan ta bort Conversations tabbelen i databasen.
