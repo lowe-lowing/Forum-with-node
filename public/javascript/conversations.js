@@ -50,6 +50,7 @@ function logout() {
 // end of template
 $(document).ready(function() {
     document.querySelector(".sendBtn").addEventListener("click", sendMsg)
+    getConv()
 });
 
 function sendMsg() {
@@ -81,8 +82,8 @@ function getConv() {
         data: {id: location.href.split('#')[1]}
     }).done(function(data){
         if(data.success){
-            console.log(data.message[0].message);
-            document.querySelector(".message-container").innerHTML = JSON.stringify(data.message)
+            console.log(data.message);
+            move_msg(data.message)
             return;
         }
     }).fail(function(){
@@ -91,3 +92,31 @@ function getConv() {
     });
 }
 // <!-- make ajax call to send the message on button press -->
+function move_msg(response) {
+    // get req.session.userid from the server
+    messages = response
+    for (let i = 0; i < messages.length; i++) {
+      const element = messages[i];
+      toArray = element
+      msg = toArray[0]
+      from = toArray[1]
+      to = toArray[2]
+      latest_loaded_message = toArray[3]
+      if (from == loggedInUser) {
+          var u = document.querySelector("#chat")
+          var p = document.createElement("li");
+          p.className = "me";
+          u.appendChild(p)
+          var textnode = document.createTextNode(msg);
+          p.appendChild(textnode)
+      }
+      else if (from == reciever) {
+          var u = document.querySelector("#chat")
+          var p = document.createElement("li");
+          p.className = "him";
+          u.appendChild(p)
+          var textnode = document.createTextNode(msg);
+          p.appendChild(textnode)
+      }
+    }
+}

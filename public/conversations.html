@@ -31,7 +31,6 @@
 			  <div class="sidebar-btn"><a href="./index.html">Forums</a></div>
 			  <div class="sidebar-btn"><a href="./friends.html">Friends</a></div>
 			  <div class="sidebar-btn"><a href="./addfriend.html">Add Friends</a></div>
-			  <div class="sidebar-btn"><a href="./conversations.html">Conversations</a></div>
 			</div>
 		
 		</div>
@@ -39,13 +38,27 @@
 		<div id="container">
 			<div class="title">
 				<h1>Social</h1>
-				<div>
+			</div>
+			<div class="showmesages">
+				<div class="B">
+				  <h4>Your messages:</h4>
+				  <div class="Scroll height2" id="chatbot">
+					<ul id="chat">
+					</ul>
+				  </div>
+				  <div id="sendbox">
 					<input class="msgInput" type="text" placeholder="Send message...">
 					<button class="sendBtn">Send</button>
 					<!-- make ajax call to send the message on button press -->
+					<!-- <form>
+					  <input type="text" name="msg" id="reciever" placeholder="">
+					  <input type="hidden" name="from" value="?php 
+					  <input type="hidden" name="to">
+					  <button id="btnSend">send</button>
+					</form> -->
+				  </div>
 				</div>
-			</div>
-			<div class="message-container"></div>
+			  </div>
         </div>
         <div class="userdiv"></div>
 		<!-- jQuery library -->

@@ -225,11 +225,71 @@ th, td {
 .table-friendRequestsSent {
   float: left;
 }
-.table-friendRequestsRecieved {
+/* .table-friendRequestsRecieved {
 }
 .table-friends {
 }
 .friendRequestsDiv {
 }
 .friendsDiv {
+} */
+ul{
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+ul li{
+  display: inline-block;
+  clear: both;
+  padding: 20px;
+  border-radius: 30px;
+  margin-bottom: 2px;
+}
+.him{
+  background: #eee;
+  float: left;
+  margin-left: 8px;
+}
+.me{
+  float: right;
+  background: #0084ff;
+  color: #fff;
+  margin-right: 8px;
+}
+.him + .me{
+  border-bottom-right-radius: 5px;
+}
+.me + .me{
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.me:last-of-type{
+  border-bottom-right-radius: 30px;
+}
+.B {
+  border: solid 0.5vh rgb(253, 60, 60);
+  border-radius: 10px;
+  margin: auto;
+  width: 50%;
+}
+.row {
+  margin: 0;
+  justify-content: end;
+}
+.Scroll {
+  overflow-y: scroll;
+  height: 40vh;
+  padding-bottom: 20px;
+}
+.height2{
+  height: 300px;
+}
+#sendbox {
+  border-top: rgb(253, 60, 60) solid 0.5vh;
+  margin-top: 20px;
+  padding: 1.5%;
+}
+#user {
+  margin-left: 180px;
+  font-size: 20px;
 }
