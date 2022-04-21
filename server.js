@@ -125,6 +125,11 @@ function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
       errors = true;
       res.redirect("register.html?passwordsdontmatch")
     }
+    // check password length
+    if (usersPwd[0].length < 3) {
+      errors = true;
+      res.redirect("register.html?passwordtoshort")
+    }
     // check user exists
     con.query(`SELECT * FROM users WHERE usersUid = '${usersUid}' OR usersEmail = '${usersEmail}';`, function (err, result) {
       if (err) throw err;
@@ -148,9 +153,7 @@ function CreateUser(res, usersName, usersEmail, usersUid, usersPwd) {
     });
   }); 
 }
-let loggingIn = false
 function LoginUser(req, res, username, password) {
-  loggingIn = true
   let con = mysql.createConnection({
     host: "localhost",
     user: "root",
